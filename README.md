@@ -89,6 +89,8 @@ docker compose up -d --build
 - Para usar solo la analítica sobre videos que ya existen: `docker compose up -d api web`.
 - `ORT_THREADS` y `API_CPUS` (por defecto 4) limitan la CPU de la api para que el recorder nunca se quede sin ella.
 - En Linux, pon `HOST_UID` y `HOST_GID` (salida de `id -u` / `id -g`) para que los archivos queden a tu nombre.
+- Antes de arrancar recorder y api, el servicio `init` crea `HOST_RECORDINGS` y `HOST_DATA` si no existen y se las asigna a `HOST_UID:HOST_GID` (si las creara Docker, quedarían de root y la api no podría abrir la base).
+- Si el puerto 8080 ya está ocupado en el equipo (`address already in use`), cambia `WEB_PORT` en `.env`.
 
 Ver logs y detener:
 

@@ -9,10 +9,24 @@ x-host-user: &host-user
   # En Linux, para que los archivos queden a tu nombre: HOST_UID=$(id -u) HOST_GID=$(id -g) en .env.
   user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
 
+x-after-init: &after-init
+  depends_on:
+    init:
+      condition: service_completed_successfully
+
 services:
+  # Si las carpetas del host no existen, Docker las crea como root y el recorder y la api
+  # (que no corren como root) no pueden escribir en ellas. Este paso las crea y les asigna dueño.
+  init:
+    image: busybox:1.37
+    command: chown "${HOST_UID:-1000}:${HOST_GID:-1000}" /recordings /data
+    volumes:
+      - ${HOST_RECORDINGS:-./recordings}:/recordings
+      - ${HOST_DATA:-./data}:/data
+
   recorder:
     build: ./recorder
-    <<: *host-user
+    <<: [*host-user, *after-init]
     init: true
     restart: unless-stopped
     env_file: .env
@@ -23,7 +37,7 @@ services:
 
   api:
     build: ./api
-    <<: *host-user
+    <<: [*host-user, *after-init]
     init: true
     restart: unless-stopped
     env_file: .env
