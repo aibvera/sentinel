@@ -45,4 +45,5 @@ services:
     depends_on:
       - api
     ports:
-      - "${WEB_PORT:-8080}:80"
+      # 0.0.0.0: la web queda abierta a la red local (http://IP_DEL_EQUIPO:8080), no solo a localhost.
+      - "0.0.0.0:${WEB_PORT:-8080}:80"

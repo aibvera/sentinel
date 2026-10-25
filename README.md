@@ -23,7 +23,7 @@ sentinel/
 |---|---|
 | `recorder` | Graba clips mp4 (H.264) solo cuando hay movimiento, en `HOST_RECORDINGS/AAAA-MM-DD/HH-MM-SS.mp4`, y borra los antiguos |
 | `api` | FastAPI y, en un hilo del mismo proceso, el worker que analiza los clips (es el único que escribe en la base) |
-| `web` | React + Vite + Tailwind servido con nginx, que reenvía `/api` a la api. Disponible en `http://localhost:8080` |
+| `web` | React + Vite + Tailwind servido con nginx, que reenvía `/api` a la api. Disponible en `http://localhost:8080` y, desde la red local, en `http://IP_DEL_EQUIPO:8080` |
 
 ## Recorder
 
@@ -99,6 +99,25 @@ docker compose logs -f recorder api
 ```bash
 docker compose down
 ```
+
+### Acceso desde otra PC de la red local
+
+La web escucha en todas las interfaces del equipo (`0.0.0.0:8080`), así que cualquier PC o celular conectado a la misma red puede abrirla:
+
+1. En el equipo donde corre Sentinel, busca su IP local: en Windows con `ipconfig` (la "Dirección IPv4" del adaptador Wi-Fi o Ethernet, p. ej. `192.168.1.41`); en Linux con `hostname -I`.
+2. Desde la otra PC, abre `http://IP_DEL_EQUIPO:8080` (o el puerto que pongas en `WEB_PORT`).
+
+Si no carga:
+- **Windows:** la red del equipo debe ser **privada** (Configuración → Red e Internet → propiedades de la red). Docker Desktop crea al instalarse la regla de firewall que permite conexiones entrantes en redes privadas. Si falta, créala desde una PowerShell como administrador:
+
+  ```powershell
+  New-NetFirewallRule -DisplayName "Sentinel web" -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow -Profile Private
+  ```
+
+- **Linux:** si usas `ufw`, ejecuta `sudo ufw allow 8080/tcp`.
+- Fija la IP del equipo en el router (reserva DHCP) para que la dirección no cambie.
+
+> La web no tiene usuario ni contraseña: cualquiera en la red local puede ver los videos y los rostros. **No abras el puerto en el router hacia internet**; para entrar desde fuera de casa, usa una VPN (p. ej. WireGuard o Tailscale).
 
 ## Desarrollo local
 
