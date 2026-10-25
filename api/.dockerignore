@@ -1,0 +1,7 @@
+__pycache__
+*.pyc
+tests
+.pytest_cache
+# Los modelos se generan dentro del build, nunca se copian del disco local.
+models/*.onnx
+models/*.pt

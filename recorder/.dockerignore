@@ -1,0 +1,10 @@
+*
+!requirements.txt
+!main.py
+!config.py
+!camera.py
+!motion.py
+!recorder.py
+!storage.py
+!lifecycle.py
+!alerts.py

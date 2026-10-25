@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+.env.*
+!.env.example
+recordings/
+data/
+# Videos, rostros, base y logs nunca van al repo, aunque HOST_RECORDINGS o HOST_DATA apunten a otra carpeta.
+*.mp4
+*.jpg
+*.db
+*.db-journal
+*.log
+web/node_modules/
+web/dist/
+*.tsbuildinfo
+# Modelos: se generan en el build (api/models/download.py)
+api/models/*.onnx
+api/models/*.pt
+.claude
+.vscode

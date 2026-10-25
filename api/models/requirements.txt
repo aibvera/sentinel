@@ -1,0 +1,8 @@
+# Solo para generar los modelos (etapa `export` del Dockerfile); no va en la imagen final.
+# torch y torchvision salen del índice CPU de PyTorch (--extra-index-url https://download.pytorch.org/whl/cpu).
+torch==2.14.1+cpu
+torchvision==0.29.1+cpu
+ultralytics==8.4.188
+onnx==1.23.2
+onnxslim==0.1.98
+onnxruntime==1.31.0
