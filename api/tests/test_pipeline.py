@@ -82,6 +82,27 @@ def test_pipeline(app):
         print(c["start_ts"], c["duration"], "s", c["max_persons"], "personas", c["face_count"], "rostros", c["processing_ms"], "ms")
 
 
+def test_clip_changed_after_scan(app):
+    """Un clip que cambia después del escaneo se reanaliza una vez, sin quedar en un bucle."""
+    worker = app.state.worker
+    s = worker._settings
+    worker.load_models()
+    worker.scan()
+    total = len(list(s.recordings_path.glob("*/*.mp4")))
+    # Como si el recorder lo hubiera seguido grabando después del escaneo.
+    clip = next(s.recordings_path.glob("*/*.mp4"))
+    later = time.time() - 1800
+    os.utime(clip, (later, later))
+
+    for _ in range(total + 2):
+        if not worker.process_next():
+            break
+    else:
+        pytest.fail("process_next no terminó: el clip cambiado se reintenta sin fin")
+    status = TestClient(app).get("/api/status").json()
+    assert status["pending"] == 0 and status["done"] == total
+
+
 def test_bad_day(app):
     assert TestClient(app).get("/api/days/../clips").status_code == 404
     assert TestClient(app).get("/api/days/2026-1-1/clips").status_code == 422

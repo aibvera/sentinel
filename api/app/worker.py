@@ -153,6 +153,11 @@ class Worker:
             self.current = None
 
         if stat.st_size != row["size"] or stat.st_mtime != row["mtime"]:
+            # Se guarda el estado nuevo: con el viejo, process_next lo elegiría una y otra vez sin que
+            # scan llegue a correr, y el reintento esperaría a que el clip se estabilice.
+            self._db.execute(
+                "UPDATE clips SET size = ?, mtime = ? WHERE id = ?", (stat.st_size, stat.st_mtime, row["id"]),
+            )
             log.info("%s cambió durante el análisis; se reintentará", row["path"])
             return
 
